@@ -10,12 +10,15 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      // Attach user id and role to req.user for role-based access
+      // Always fetch user from DB for up-to-date role
       const user = await User.findById(decoded.id);
-      if (user && user.isBlocked) {
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+      if (user.isBlocked) {
         return res.status(403).json({ message: 'User is blocked. Contact admin.' });
       }
-      req.user = { id: decoded.id, role: decoded.role };
+      req.user = user; // Attach full user object
       next();
     } catch (err) {
       return res.status(401).json({ message: 'Not authorized, token failed' });

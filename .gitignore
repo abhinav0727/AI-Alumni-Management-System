@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+
+# Environment variables
+backend/config/.env
+
+# Uploaded resumes
+backend/uploads/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

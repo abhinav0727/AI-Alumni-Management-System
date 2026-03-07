@@ -30,7 +30,7 @@ exports.getStudents = async (req, res) => {
     if (req.query.department) filters.department = req.query.department;
     if (req.query.section) filters.section = req.query.section;
     if (req.query.admissionYear) filters.admissionYear = req.query.admissionYear;
-    const profiles = await StudentProfile.find(filters).populate('user');
+    const profiles = await StudentProfile.find(filters).populate('user', 'name email role');
     const result = await Promise.all(profiles.map(async (profile) => {
       const department = await Department.findOne({ name: profile.department });
       const eligible = await isEligible(profile, profile.user);
@@ -58,7 +58,7 @@ exports.graduatePreview = async (req, res) => {
     if (department) filters.department = department;
     if (section) filters.section = section;
     if (admissionYear) filters.admissionYear = admissionYear;
-    const profiles = await StudentProfile.find(filters).populate('user');
+    const profiles = await StudentProfile.find(filters).populate('user', 'name email role');
     const eligibleUsers = [];
     const nonEligibleUsers = [];
     for (const profile of profiles) {
@@ -87,7 +87,7 @@ exports.graduateConfirm = async (req, res) => {
     if (department) filters.department = department;
     if (section) filters.section = section;
     if (admissionYear) filters.admissionYear = admissionYear;
-    const profiles = await StudentProfile.find(filters).populate('user');
+    const profiles = await StudentProfile.find(filters).populate('user', 'name email role');
     let graduated = 0;
     for (const profile of profiles) {
       if (await isEligible(profile, profile.user)) {
@@ -116,7 +116,7 @@ exports.graduateConfirm = async (req, res) => {
 exports.graduateSingle = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const profile = await StudentProfile.findOne({ user: userId }).populate('user');
+    const profile = await StudentProfile.findOne({ user: userId }).populate('user', 'name email role');
     if (!profile || !(await isEligible(profile, profile.user))) {
       return res.status(400).json({ message: 'User not eligible for graduation.' });
     }
@@ -142,11 +142,15 @@ exports.graduateSingle = async (req, res) => {
 exports.revertGraduation = async (req, res) => {
   try {
     const userId = req.params.userId;
-    await User.updateOne({ _id: userId }, { role: 'student' });
-    await AlumniProfile.updateOne(
-      { user: userId },
-      { $set: { isActive: false } }
-    );
+    const user = await User.findById(userId);
+    if (!user || user.role !== 'alumni') {
+      return res.status(404).json({ message: 'Alumni user not found' });
+    }
+    user.role = 'student';
+    await user.save();
+    // Remove AlumniProfile
+    await require('../models/AlumniProfile').findOneAndDelete({ user: userId });
+    // Audit log
     await AuditLog.create({
       action: 'REVERTED',
       performedBy: req.user.id,

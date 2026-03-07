@@ -10,20 +10,21 @@ const userSchema = new mongoose.Schema({
   academicDetails: { type: Object },
   professionalDetails: { type: Object },
   skills: [{ type: String }],
-  resume: { type: String },
+  resumeURL: { type: String },
+  extractedSkills: [{ type: String }],
   isMentorAvailable: { type: Boolean, default: false },
   isBlocked: { type: Boolean, default: false },
 }, { timestamps: true });
 
+
+// Secure password hashing
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) {
-    return;
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (!this.isModified('password')) return;
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.methods.comparePassword = async function (candidatePassword) {
+
+userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
