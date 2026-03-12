@@ -1,12 +1,9 @@
 const User = require('../models/User');
+const StudentProfile = require('../models/StudentProfile');
+const AlumniProfile = require('../models/AlumniProfile');
 const pdfService = require('../services/pdfService');
+const nlpService = require('../services/nlpService');
 const path = require('path');
-
-// Predefined skill list (can be moved to config/db in future)
-const SKILL_LIST = [
-  'JavaScript', 'Python', 'Java', 'C++', 'Node.js', 'React', 'MongoDB', 'Express', 'SQL', 'HTML', 'CSS',
-  'Machine Learning', 'Data Analysis', 'AWS', 'Docker', 'Kubernetes', 'Git', 'REST', 'GraphQL', 'TypeScript'
-];
 
 // POST /api/resume/upload
 exports.uploadResume = async (req, res) => {
@@ -17,20 +14,55 @@ exports.uploadResume = async (req, res) => {
     if (req.file.mimetype !== 'application/pdf') {
       return res.status(400).json({ message: 'Only PDF files are allowed' });
     }
+    
     // Extract text from PDF
     const pdfPath = path.resolve(req.file.path);
     const text = await pdfService.extractTextFromPDF(pdfPath);
-    // Basic keyword-based skill extraction
-    const extractedSkills = SKILL_LIST.filter(skill =>
-      new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(text)
-    );
-    // Update user document
+    
+    // Extract skills using the centralized NLP service
+    const extractedSkills = nlpService.extractSkills(text);
+    
+    let updatedProfile = null;
+    let roleMessage = '';
+
+    // Update profile based on user role
+    if (req.user.role === 'student') {
+      updatedProfile = await StudentProfile.findOneAndUpdate(
+        { user: req.user.id },
+        { 
+          resume: req.file.path, 
+          skills: extractedSkills 
+        },
+        { new: true, upsert: true }
+      );
+      roleMessage = 'Student resume uploaded and skills extracted';
+    } else if (req.user.role === 'alumni') {
+      updatedProfile = await AlumniProfile.findOneAndUpdate(
+        { user: req.user.id },
+        { 
+          resume: req.file.path,
+          skills: extractedSkills,
+          isMentorAvailable: true 
+        },
+        { new: true, upsert: true }
+      );
+      roleMessage = 'Alumni resume uploaded and skills extracted';
+    } else {
+      return res.status(403).json({ message: 'Role not authorized for resume upload' });
+    }
+
+    // Optional backwards compatibility: still update base User model
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { resumeURL: req.file.path, extractedSkills },
       { new: true }
     ).select('-password');
-    res.status(200).json({ message: 'Resume uploaded and skills extracted', user });
+
+    res.status(200).json({ 
+      message: roleMessage, 
+      user,
+      profile: updatedProfile
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
