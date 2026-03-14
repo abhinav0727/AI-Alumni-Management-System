@@ -293,169 +293,365 @@ After implementation verify:
 
 ---
 
-# PHASE 6 – Mentor Matching System
+# PHASE 6 – AI Mentor Recommendation Engine
 
 **Objective:**
-- Match students with alumni mentors based on skill similarity
+Implement an AI-driven mentor recommendation system that matches students with alumni mentors using NLP-based similarity scoring.
 
-**Tasks:**
-- Skill comparison algorithm
-- Overlap scoring logic
-- Sorted recommendations endpoint
+This phase upgrades the simple skill matching approach to an AI-powered recommendation engine.
 
-**Deliverables:**
-- Top mentor recommendations returned
+**Architecture Overview**
 
-**Files to Create/Modify:**
-- backend/services/matchingService.js
-- backend/controllers/mentorController.js
-- backend/routes/mentorRoutes.js
+The recommendation system will use:
 
-**APIs to Implement:**
-- GET /api/mentors/recommend
+- TF-IDF vectorization of skills
+- Cosine similarity scoring
+- Ranking of alumni mentors based on similarity score
 
-**Testing Checklist:**
-- Test recommendations for various students
-- Validate scoring and sorting
+Student resume skills extracted in Phase 5 will be used as the input.
+
+Alumni skills stored in AlumniProfile will be used as the candidate mentor dataset.
+
+**Recommendation Flow**
+
+1) Fetch student skills from database
+2) Fetch alumni mentors where isMentorAvailable = true
+3) Convert skills into text documents
+4) Apply TF-IDF vectorization
+5) Compute cosine similarity
+6) Rank mentors by similarity score
+7) Return top mentors
+
+**Deliverables**
+
+- AI-based mentor recommendation endpoint
+- Ranked mentor list
+- Similarity scores returned
+
+**Files to Create/Modify**
+
+backend/services/recommendationService.js  
+backend/controllers/mentorController.js  
+backend/routes/mentorRoutes.js  
+
+**APIs to Implement**
+
+GET /api/mentors/recommend
+
+Response Example:
+
+{
+  "mentors": [
+    {
+      "alumniId": "...",
+      "name": "...",
+      "company": "...",
+      "skills": ["Python","ML"],
+      "similarityScore": 0.82
+    }
+  ]
+}
+
+**Middleware Required**
+
+- protect
+- roleMiddleware("student")
+
+**Testing Checklist**
+
+- Student with skills receives mentor recommendations
+- Mentors sorted by similarity score
+- Only mentors with isMentorAvailable=true returned
+- Endpoint restricted to students only
 
 **STOP HERE. WAIT FOR PHASE 7 INSTRUCTION BEFORE CONTINUING.**
 
----
+# PHASE 7 – Job & Opportunity Portal
 
-# PHASE 7 – Job Portal Module
+Objective:
+Create a job and internship portal where alumni can post opportunities and students can apply.
 
-**Objective:**
-- Alumni can post jobs
-- Students can view & apply
+This module strengthens alumni-student engagement and supports career development.
 
-**Tasks:**
-- Job model
-- Job CRUD endpoints
-- Role restrictions
-- Job recommendation logic
+Features
 
-**Deliverables:**
-- Job posting & viewing working
+Alumni:
 
-**Files to Create/Modify:**
-- backend/models/Job.js
-- backend/controllers/jobController.js
-- backend/routes/jobRoutes.js
+Post jobs
 
-**APIs to Implement:**
-- POST /api/jobs (alumni)
-- GET /api/jobs (students)
+Edit job posts
 
-**Testing Checklist:**
-- Test job posting as alumni
-- Test job viewing as student
+Delete job posts
 
-**STOP HERE. WAIT FOR PHASE 8 INSTRUCTION BEFORE CONTINUING.**
+View jobs they posted
 
----
+Students:
+
+View available jobs
+
+Apply to jobs
+
+Track applications
+
+Database Model
+
+Job Model fields:
+
+title
+
+company
+
+description
+
+requiredSkills
+
+location
+
+postedBy (Alumni userId)
+
+Applications structure:
+
+applications (array)
+
+Each application object contains:
+
+student (student userId)
+
+status ("applied", "accepted", "rejected")
+
+appliedAt
+
+createdAt
+
+Files to Create/Modify
+
+backend/models/Job.js
+backend/controllers/jobController.js
+backend/routes/jobRoutes.js
+
+APIs to Implement
+
+POST /api/jobs (alumni only)
+PUT /api/jobs/:jobId (alumni edit job)
+DELETE /api/jobs/:jobId (alumni delete job)
+GET /api/jobs (students view jobs)
+GET /api/jobs/my-jobs (alumni view jobs they posted)
+POST /api/jobs/apply/:jobId (students apply to job)
+GET /api/jobs/my-applications (students view applications)
+
+Middleware Required
+
+protect
+
+roleMiddleware
+
+Testing Checklist
+
+Alumni can post jobs
+
+Alumni can edit job posts
+
+Alumni can delete job posts
+
+Students can view jobs
+
+Students can apply to jobs
+
+Applications stored in DB
+
+Duplicate applications prevented
+
+Role restrictions enforced
+
+STOP HERE. WAIT FOR PHASE 8 INSTRUCTION BEFORE CONTINUING.
 
 # PHASE 8 – Admin Dashboard & Analytics
 
-**Objective:**
-- System-level visibility
+Objective:
+Provide system-wide analytics for administrators to monitor platform activity.
 
-**Tasks:**
-- Total users
-- Total alumni
-- Active mentors
-- System metrics
+Metrics to Implement
 
-**Deliverables:**
-- Admin analytics endpoints
+Total registered users
 
-**Files to Create/Modify:**
-- backend/controllers/adminController.js
-- backend/routes/adminRoutes.js
+Total students
 
-**APIs to Implement:**
-- GET /api/admin/stats
+Total alumni
 
-**Testing Checklist:**
-- Test analytics endpoints as admin
+Active mentors
 
-**STOP HERE. WAIT FOR PHASE 9 INSTRUCTION BEFORE CONTINUING.**
+Jobs posted
 
----
+Job applications count
 
-# PHASE 9 – Frontend Integration (React)
+Graduation transitions count
 
-**Objective:**
-- Connect backend to frontend
+Deliverables
 
-**Tasks:**
-- Authentication UI
-- Role-based dashboard
-- Resume upload UI
-- Mentor recommendation UI
+Admin analytics API returning system statistics.
 
-**Deliverables:**
-- Fully integrated working UI
+Files to Create/Modify
 
-**Files to Create/Modify:**
-- frontend/src/pages/
-- frontend/src/components/
-- frontend/src/services/
+backend/controllers/adminController.js
+backend/routes/adminRoutes.js
 
-**Testing Checklist:**
-- Test all UI flows
-- Validate backend integration
+APIs to Implement
 
-**STOP HERE. WAIT FOR PHASE 10 INSTRUCTION BEFORE CONTINUING.**
+GET /api/admin/stats
 
----
+Example Response:
 
-# PHASE 10 – AI Enhancement (Advanced)
+{
+"totalUsers": 320,
+"totalStudents": 210,
+"totalAlumni": 110,
+"activeMentors": 34,
+"jobsPosted": 18,
+"applications": 96
+}
 
-**Objective:**
-- Improve recommendation system
+Middleware Required
 
-**Tasks:**
-- TF-IDF
-- Cosine similarity
-- Context-aware matching
+protect
 
-**Deliverables:**
-- Smarter recommendation engine
+roleMiddleware("admin")
 
-**Files to Create/Modify:**
-- backend/services/aiService.js
+Testing Checklist
 
-**APIs to Implement:**
-- GET /api/ai/recommend
+Only admin can access analytics
 
-**Testing Checklist:**
-- Validate advanced recommendations
+Metrics match database records
 
----
+Endpoint returns aggregated data
 
-For EACH phase:
-- What to build
-- Files to create/modify
-- APIs to implement
-- Database changes
-- Middleware needed
-- Testing checklist
-- When to stop and wait
+Aggregation queries return correct counts
 
-------------------------------------------
-IMPORTANT RULES
-------------------------------------------
+STOP HERE. WAIT FOR PHASE 9 INSTRUCTION BEFORE CONTINUING.
 
-- Do NOT rewrite Phase 1 implementation.
-- Maintain current working backend.
-- Do NOT break authentication.
-- Write guide professionally.
-- Save file.
+# HASE 9 – Frontend Integration (React)
 
-After writing complete guide, stop.
-Do NOT start implementing Phase 2 until instructed.
+Objective:
+Build a modern web interface to interact with the backend APIs.
 
-IMPORTANT:
-This task is documentation-only.
-Do NOT modify any existing source code files.
-Only edit IMPLEMENTATION_GUIDE.md.
+Technology Stack
+
+React
+
+Tailwind CSS
+
+Axios
+
+React Router
+
+Core Pages
+
+Authentication
+
+Login
+
+Register
+
+Student Dashboard
+
+Profile
+
+Resume upload
+
+Mentor recommendations
+
+Job listings
+
+My job applications
+
+Alumni Dashboard
+
+Profile
+
+Mentor availability toggle
+
+Job posting
+
+Manage posted jobs
+
+Admin Dashboard
+
+Analytics
+
+Lifecycle management
+
+Deliverables
+
+Fully functional frontend connected to backend APIs
+
+Role-based dashboard rendering
+
+API integration using Axios
+
+Files to Create
+
+frontend/src/pages
+frontend/src/components
+frontend/src/services/api.js
+
+Testing Checklist
+
+Login works
+
+Role dashboards load correctly
+
+Resume upload works
+
+Mentor recommendation visible
+
+Job portal working
+
+Job applications visible for students
+
+Alumni can manage job postings
+
+STOP HERE. WAIT FOR PHASE 10 INSTRUCTION BEFORE CONTINUING.
+
+# PHASE 10 – Advanced AI Recommendation Engine
+
+Objective:
+Enhance the recommendation engine using more advanced NLP techniques and extend AI capabilities to job recommendations.
+
+Enhancements
+
+Skill normalization
+
+Improved cosine similarity scoring
+
+Context-aware matching
+
+Job recommendation based on resume skills
+
+New Features
+
+Recommended jobs for students
+
+Recommended alumni mentors with improved ranking
+
+Skill-based job matching
+
+Improved recommendation accuracy
+
+Files to Create/Modify
+
+backend/services/aiService.js
+backend/services/recommendationService.js
+
+APIs to Implement
+
+GET /api/ai/recommend/mentors
+GET /api/ai/recommend/jobs
+
+Testing Checklist
+
+Mentor recommendations improved compared to basic matching
+
+Job recommendations match student resume skills
+
+Scores correctly calculated
+
+System performance remains acceptable

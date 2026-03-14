@@ -10,6 +10,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const resumeRoutes = require('./routes/resumeRoutes');
 const lifecycleRoutes = require('./routes/lifecycleRoutes');
 const mentorRoutes = require('./routes/mentorRoutes');
+const jobRoutes = require('./routes/jobRoutes');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
 // Load environment variables
@@ -30,6 +31,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/lifecycle', lifecycleRoutes);
 app.use('/api/mentors', mentorRoutes);
+app.use('/api/jobs', jobRoutes);
 
 // Not found and error handler middleware
 app.use(notFound);
