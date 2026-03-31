@@ -528,130 +528,161 @@ Aggregation queries return correct counts
 
 STOP HERE. WAIT FOR PHASE 9 INSTRUCTION BEFORE CONTINUING.
 
-# HASE 9 – Frontend Integration (React)
+# PHASE 9 – Academic System Integration (Backend)
 
 Objective:
-Build a modern web interface to interact with the backend APIs.
+Extend the backend system to support a full academic student portal including courses, attendance, internal marks, grades, fees, and timetable.
 
-Technology Stack
+-------------------------------------
 
-React
+Architecture Principles
 
-Tailwind CSS
+- Do NOT modify existing core models:
+  - User
+  - StudentProfile
+  - AlumniProfile
 
-Axios
+- Only ADD new modules
+- Maintain modular and scalable design
+- Follow role-based access control strictly
 
-React Router
+-------------------------------------
 
-Core Pages
+Database Models
 
-Authentication
+The following new collections must be created:
 
-Login
+1. Course
+- courseCode
+- courseName
+- department
+- semester
+- credits
+- faculty (User reference)
 
-Register
+2. Attendance
+- studentId (User reference)
+- courseId
+- semester
+- totalClasses
+- attendedClasses
 
-Student Dashboard
+3. InternalMarks
+- studentId
+- courseId
+- semester
+- marksObtained
+- maxMarks
 
-Profile
+4. Marks (Grades)
+- studentId
+- semester
+- subjects:
+  - courseId
+  - grade
+  - credits
+- sgpa
+- cgpa
 
-Resume upload
+5. Fee
+- studentId
+- semester
+- totalAmount
+- paidAmount
+- status (paid / pending)
 
-Mentor recommendations
+6. Timetable
+- studentId
+- semester
+- schedule:
+  - day
+  - time
+  - course
 
-Job listings
+-------------------------------------
 
-My job applications
+Controllers
 
-Alumni Dashboard
+Create:
+backend/controllers/academicController.js
 
-Profile
+Student (Read-only APIs):
+- getCourses
+- getAttendance
+- getInternalMarks (with semester filter)
+- getMarks (with semester filter)
+- getFees
+- getTimetable
 
-Mentor availability toggle
+Admin (Write APIs):
+- createCourse
+- assignCourse
+- updateAttendance
+- updateInternalMarks
+- updateMarks
+- updateFees
+- updateTimetable
 
-Job posting
+-------------------------------------
 
-Manage posted jobs
+Routes
 
-Admin Dashboard
+1. Student Routes
+File: backend/routes/studentRoutes.js
 
-Analytics
+Protected with:
+- protect middleware
+- roleMiddleware("student")
 
-Lifecycle management
+Endpoints:
+
+GET /api/student/courses  
+GET /api/student/attendance  
+GET /api/student/internal-marks?semester=  
+GET /api/student/marks?semester=  
+GET /api/student/fees  
+GET /api/student/timetable  
+
+-------------------------------------
+
+2. Admin Routes (Extend existing)
+
+Add endpoints:
+
+POST /api/admin/course  
+POST /api/admin/attendance  
+POST /api/admin/internal-marks  
+POST /api/admin/marks  
+POST /api/admin/fees  
+POST /api/admin/timetable  
+
+-------------------------------------
+
+Validation Rules
+
+- Ensure all studentId references belong to role "student"
+- Prevent duplicate entries
+- Validate semester inputs
+- Handle errors gracefully
+
+-------------------------------------
+
+Testing Checklist
+
+- Student can fetch all academic data successfully
+- Semester filtering works correctly
+- Admin can create and update records
+- Data consistency maintained across collections
+- No existing routes are broken
+
+-------------------------------------
 
 Deliverables
 
-Fully functional frontend connected to backend APIs
+- Fully functional academic backend module
+- Clean integration with existing system
+- Stable API endpoints for frontend consumption
 
-Role-based dashboard rendering
-
-API integration using Axios
-
-Files to Create
-
-frontend/src/pages
-frontend/src/components
-frontend/src/services/api.js
-
-Testing Checklist
-
-Login works
-
-Role dashboards load correctly
-
-Resume upload works
-
-Mentor recommendation visible
-
-Job portal working
-
-Job applications visible for students
-
-Alumni can manage job postings
+-------------------------------------
 
 STOP HERE. WAIT FOR PHASE 10 INSTRUCTION BEFORE CONTINUING.
-
-# PHASE 10 – Advanced AI Recommendation Engine
-
-Objective:
-Enhance the recommendation engine using more advanced NLP techniques and extend AI capabilities to job recommendations.
-
-Enhancements
-
-Skill normalization
-
-Improved cosine similarity scoring
-
-Context-aware matching
-
-Job recommendation based on resume skills
-
-New Features
-
-Recommended jobs for students
-
-Recommended alumni mentors with improved ranking
-
-Skill-based job matching
-
-Improved recommendation accuracy
-
-Files to Create/Modify
-
-backend/services/aiService.js
-backend/services/recommendationService.js
-
-APIs to Implement
-
-GET /api/ai/recommend/mentors
-GET /api/ai/recommend/jobs
-
-Testing Checklist
-
-Mentor recommendations improved compared to basic matching
-
-Job recommendations match student resume skills
-
-Scores correctly calculated
-
-System performance remains acceptable

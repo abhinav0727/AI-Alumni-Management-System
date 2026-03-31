@@ -4,6 +4,7 @@ backend/node_modules/
 
 # Environment variables
 backend/config/.env
+backend/config/.env
 
 # Uploaded resumes
 backend/uploads/
