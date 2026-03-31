@@ -686,3 +686,183 @@ Deliverables
 -------------------------------------
 
 STOP HERE. WAIT FOR PHASE 10 INSTRUCTION BEFORE CONTINUING.
+
+# PHASE 10 – Student Portal Frontend (React UI)
+
+Objective:
+Build a modern, clean, and professional Student Portal UI that interacts with Phase 9 backend APIs. This UI will be used for conference presentation screenshots.
+
+-------------------------------------
+
+Technology Stack
+
+- React (Vite or Create React App)
+- Tailwind CSS
+- Axios
+- React Router DOM
+
+-------------------------------------
+
+Design Principles
+
+- Clean and minimal UI (official system style)
+- Consistent layout across pages
+- Card-based dashboard design
+- Table-based academic data display
+- Dropdown-based semester filtering
+- Responsive and readable layout
+
+-------------------------------------
+
+Core Features (Student Portal)
+
+1. Dashboard
+- Welcome section (student name)
+- Summary cards:
+  - Courses count
+  - Attendance overview
+  - SGPA / CGPA preview
+- Quick navigation links
+
+-------------------------------------
+
+2. Profile Page
+- Basic details (name, email, department)
+- Academic details (year, section)
+- Data fetched from profile APIs
+
+-------------------------------------
+
+3. Courses Page
+- List of enrolled courses
+- Display:
+  - Course Code
+  - Course Name
+  - Credits
+
+-------------------------------------
+
+4. Attendance Page
+- Table format:
+  - Course Name
+  - Total Classes
+  - Attended Classes
+  - Percentage
+- Optional: progress bar visualization
+
+-------------------------------------
+
+5. Internal Marks Page (IMPORTANT)
+- Dropdown filter: Semester selection
+- Table:
+  - Course Name
+  - Marks Obtained
+  - Max Marks
+- Default: Current semester
+
+-------------------------------------
+
+6. Grades Page (IMPORTANT)
+- Dropdown filter: Semester selection
+- Table:
+  - Course Name
+  - Grade
+  - Credits
+- Display:
+  - SGPA (selected semester)
+  - CGPA (overall)
+
+-------------------------------------
+
+7. Fees Page
+- Table:
+  - Semester
+  - Total Amount
+  - Paid Amount
+  - Status (Paid / Pending)
+
+-------------------------------------
+
+8. Timetable Page
+- Weekly layout (Mon–Sat)
+- Display:
+  - Time
+  - Course
+
+-------------------------------------
+
+-------------------------------------
+
+Folder Structure
+
+frontend/src/
+
+- components/
+  - Navbar.jsx
+  - Sidebar.jsx
+  - Card.jsx
+  - Table.jsx
+
+- pages/
+  - Dashboard.jsx
+  - Profile.jsx
+  - Courses.jsx
+  - Attendance.jsx
+  - InternalMarks.jsx
+  - Grades.jsx
+  - Fees.jsx
+  - Timetable.jsx
+
+- services/
+  - api.js (Axios configuration)
+
+- App.jsx
+- main.jsx
+
+-------------------------------------
+
+API Integration
+
+Base URL:
+http://localhost:5000/api
+
+Student APIs:
+
+GET /api/student/courses  
+GET /api/student/attendance  
+GET /api/student/internal-marks?semester=  
+GET /api/student/marks?semester=  
+GET /api/student/fees  
+GET /api/student/timetable  
+
+-------------------------------------
+
+Authentication
+
+- Store JWT token in localStorage
+- Send token in headers:
+
+Authorization: Bearer <token>
+
+-------------------------------------
+
+Testing Checklist
+
+- All pages load without crash
+- API data renders correctly
+- Semester filtering works
+- Tables display correct data
+- Dashboard shows summary
+- No console errors
+
+-------------------------------------
+
+Deliverables
+
+- Fully functional Student Portal UI
+- Clean, modern interface
+- Ready screenshots for conference paper
+
+-------------------------------------
+
+STOP HERE. WAIT FOR PHASE 11 (ALUMNI PORTAL)
