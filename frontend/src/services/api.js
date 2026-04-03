@@ -37,6 +37,41 @@ export const authApi = {
 export const profileApi = {
   getStudentProfile:    ()     => api.get('/profile/student/me'),
   updateStudentProfile: (data) => api.put('/profile/student/me', data),
+  getAlumniProfile:    ()     => api.get('/profile/alumni/me'),
+  updateAlumniProfile: (data) => api.put('/profile/alumni/me', data),
+};
+
+// Alumni – Jobs APIs (real backend endpoints)
+export const alumniApi = {
+  getMyJobs:  ()     => api.get('/jobs/my-jobs'),
+  createJob:  (data) => api.post('/jobs', data),
+  deleteJob:  (id)   => api.delete(`/jobs/${id}`),
+};
+
+// Alumni – Achievements APIs
+// NOTE: backend field is 'type'; frontend calls it 'category' — mapped here.
+export const achievementsApi = {
+  getAll:  ()     => api.get('/alumni/achievements'),
+  add:     (data) => api.post('/alumni/achievements', {
+    title:       data.title,
+    description: data.description,
+    type:        data.category,   // category → type
+    date:        data.date || null,
+  }),
+  remove:  (id)   => api.delete(`/alumni/achievements/${id}`),
+};
+
+// Alumni - Mentorship APIs
+export const mentorshipApi = {
+  getRequests: () => api.get('/alumni/mentorship'),
+  updateStatus: (id, status) => api.put(`/alumni/mentorship/${id}`, { status }),
+};
+
+// Student - Mentorship APIs
+export const studentMentorshipApi = {
+  getMentors: () => api.get('/student/mentors'),
+  getMyRequests: () => api.get('/student/mentorship'),
+  createRequest: (data) => api.post('/student/mentorship', data),
 };
 
 export default api;

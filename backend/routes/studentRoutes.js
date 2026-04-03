@@ -13,6 +13,9 @@
 
 const express = require('express');
 const router = express.Router();
+
+console.log("Student routes loaded");
+
 const { protect } = require('../middleware/authMiddleware');
 const { roleMiddleware } = require('../middleware/roleMiddleware');
 const {
@@ -63,5 +66,25 @@ router.get('/fees', getFees);
  * Query: ?semester=3  (optional, integer 1-12)
  */
 router.get('/timetable', getTimetable);
+
+const { createMentorshipRequest, getMyMentorshipRequests } = require('../controllers/studentMentorshipController');
+const { getAllMentors } = require('../controllers/studentMentorController');
+
+/**
+ * GET /api/student/mentors
+ */
+router.get('/mentors', getAllMentors);
+
+/**
+ * GET /api/student/mentorship
+ * Get the current student's mentorship request states
+ */
+router.get('/mentorship', getMyMentorshipRequests);
+
+/**
+ * POST /api/student/mentorship
+ * Creates a new mentorship request to an alumni.
+ */
+router.post('/mentorship', createMentorshipRequest);
 
 module.exports = router;

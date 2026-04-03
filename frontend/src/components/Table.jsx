@@ -12,9 +12,9 @@ export default function Table({ columns = [], data = [], emptyMsg = 'No data ava
       <table className="min-w-full divide-y divide-slate-200 text-sm">
         <thead className="bg-slate-50">
           <tr>
-            {columns.map((col) => (
+            {columns.map((col, idx) => (
               <th
-                key={col.key}
+                key={`${col.key}-${idx}`}
                 className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap"
               >
                 {col.label}
@@ -36,11 +36,11 @@ export default function Table({ columns = [], data = [], emptyMsg = 'No data ava
           ) : (
             data.map((row, idx) => (
               <tr
-                key={idx}
+                key={row._id || row.id || idx}
                 className="hover:bg-slate-50 transition-colors duration-100"
               >
-                {columns.map((col) => (
-                  <td key={col.key} className="px-5 py-3.5 text-slate-700 whitespace-nowrap">
+                {columns.map((col, colIdx) => (
+                  <td key={`${col.key}-${colIdx}`} className="px-5 py-3.5 text-slate-700 whitespace-nowrap">
                     {col.render ? col.render(row[col.key], row) : row[col.key] ?? '—'}
                   </td>
                 ))}

@@ -1,6 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 
-const NAV_ITEMS = [
+/* ── Navigation items per role ─────────────────────────── */
+
+const STUDENT_NAV = [
   { to: '/dashboard',      label: 'Dashboard',       icon: HomeIcon },
   { to: '/profile',        label: 'Profile',          icon: UserIcon },
   { to: '/courses',        label: 'Courses',          icon: BookIcon },
@@ -9,13 +11,28 @@ const NAV_ITEMS = [
   { to: '/grades',         label: 'Grades',           icon: AcademicCapIcon },
   { to: '/fees',           label: 'Fees',             icon: CurrencyIcon },
   { to: '/timetable',      label: 'Timetable',        icon: CalendarIcon },
+  { to: '/mentorship',     label: 'Mentorship',       icon: HandIcon },
+];
+
+const ALUMNI_NAV = [
+  { to: '/alumni/dashboard',    label: 'Dashboard',    icon: HomeIcon },
+  { to: '/alumni/profile',      label: 'Profile',      icon: UserIcon },
+  { to: '/alumni/achievements', label: 'Achievements', icon: StarIcon },
+  { to: '/alumni/mentorship',   label: 'Mentorship',   icon: HandIcon },
+  { to: '/alumni/jobs',         label: 'Jobs',         icon: BriefcaseIcon },
+  { to: '/alumni/posts',        label: 'Posts',        icon: ChatIcon },
 ];
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const user     = JSON.parse(localStorage.getItem('user') || '{}');
+  const role     = user.role || 'student';                 // 'student' | 'alumni' | 'admin'
+  const navItems = role === 'alumni' ? ALUMNI_NAV : STUDENT_NAV;
+  const portalLabel = role === 'alumni' ? 'Alumni Portal' : 'Student Portal';
 
   function handleLogout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   }
 
@@ -24,19 +41,20 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-slate-200">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center
+                           ${role === 'alumni' ? 'bg-violet-600' : 'bg-primary-600'}`}>
             <AcademicCapIcon className="w-5 h-5 text-white" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 leading-none">AMS</p>
-            <p className="text-xs text-slate-500 mt-0.5">Student Portal</p>
+            <p className="text-xs text-slate-500 mt-0.5">{portalLabel}</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+        {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -50,8 +68,14 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-slate-200">
+      {/* User chip + Logout */}
+      <div className="px-3 py-4 border-t border-slate-200 space-y-1">
+        {user.name && (
+          <div className="px-4 py-2 mb-1">
+            <p className="text-xs font-semibold text-slate-700 truncate">{user.name}</p>
+            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+          </div>
+        )}
         <button
           onClick={handleLogout}
           className="sidebar-link w-full text-red-500 hover:bg-red-50 hover:text-red-600"
@@ -64,7 +88,7 @@ export default function Sidebar() {
   );
 }
 
-/* ── Inline SVG icons (no icon library dependency) ── */
+/* ── Inline SVG icons ──────────────────────────────────── */
 
 function HomeIcon({ className }) {
   return (
@@ -73,7 +97,6 @@ function HomeIcon({ className }) {
     </svg>
   );
 }
-
 function UserIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -81,7 +104,6 @@ function UserIcon({ className }) {
     </svg>
   );
 }
-
 function BookIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -89,7 +111,6 @@ function BookIcon({ className }) {
     </svg>
   );
 }
-
 function ClipboardIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -97,7 +118,6 @@ function ClipboardIcon({ className }) {
     </svg>
   );
 }
-
 function PencilIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -105,7 +125,6 @@ function PencilIcon({ className }) {
     </svg>
   );
 }
-
 function AcademicCapIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -113,7 +132,6 @@ function AcademicCapIcon({ className }) {
     </svg>
   );
 }
-
 function CurrencyIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -121,7 +139,6 @@ function CurrencyIcon({ className }) {
     </svg>
   );
 }
-
 function CalendarIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -129,11 +146,38 @@ function CalendarIcon({ className }) {
     </svg>
   );
 }
-
 function LogoutIcon({ className }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+    </svg>
+  );
+}
+function StarIcon({ className }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+    </svg>
+  );
+}
+function HandIcon({ className }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.471 1.575 1.575 0 10-2.228-2.228 3.818 3.818 0 00-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0116.35 15m.002 0h-.002" />
+    </svg>
+  );
+}
+function BriefcaseIcon({ className }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+    </svg>
+  );
+}
+function ChatIcon({ className }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
     </svg>
   );
 }

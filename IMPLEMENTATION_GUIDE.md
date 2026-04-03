@@ -865,4 +865,184 @@ Deliverables
 
 -------------------------------------
 
-STOP HERE. WAIT FOR PHASE 11 (ALUMNI PORTAL)
+# PHASE 11 – Alumni Portal (Frontend + Integration)
+
+Objective:
+Develop a modern Alumni Portal interface that enables alumni to manage their professional profile, interact with students, handle mentorship requests, and contribute career opportunities.
+
+-------------------------------------
+
+Technology Stack
+
+- React (Vite)
+- Tailwind CSS
+- Axios
+- React Router DOM
+
+-------------------------------------
+
+Design Principles
+
+- Clean and professional UI (LinkedIn-inspired simplicity)
+- Card-based layout for dashboards
+- Table-based structure for data-heavy views
+- Clear separation between mentorship, jobs, and profile
+- Consistent UI with Student Portal
+
+-------------------------------------
+
+Core Features (Alumni Portal)
+
+1. Alumni Dashboard
+- Welcome section (Alumni name)
+- Summary cards:
+  - Total mentorship requests
+  - Accepted mentees
+  - Jobs posted
+- Quick navigation
+
+-------------------------------------
+
+2. Profile Page (IMPORTANT)
+- Basic Details:
+  - Name
+  - Email
+  - Department
+  - Graduation Year
+
+- Professional Details:
+  - Current Company
+  - Previous Companies
+  - Role / Designation
+  - Years of Experience
+
+- Skills Section (from resume or manual)
+
+-------------------------------------
+
+3. Achievements Page
+- Add and view:
+  - Certifications
+  - Awards
+  - Publications
+
+-------------------------------------
+
+4. Mentorship Management (IMPORTANT)
+- View incoming mentorship requests from students
+- Display:
+  - Student Name
+  - Department
+  - Request Status
+
+- Actions:
+  - Accept Request
+  - Reject Request
+
+-------------------------------------
+
+5. Jobs Module
+- Create job posting
+- Fields:
+  - Job Title
+  - Company
+  - Description
+  - Skills Required
+
+- View all posted jobs
+- Manage (edit/delete optional)
+
+-------------------------------------
+
+6. Posts / Feed System
+- Alumni can create posts:
+  - Motivation
+  - Events
+  - Opportunities
+
+- Display list of posts (basic feed)
+
+-------------------------------------
+
+7. Resume & Skills (Basic)
+- Upload resume (optional)
+- Display extracted skills (basic UI only)
+
+-------------------------------------
+
+-------------------------------------
+
+Folder Structure
+
+frontend/src/
+
+- pages/
+  - AlumniDashboard.jsx
+  - AlumniProfile.jsx
+  - Achievements.jsx
+  - Mentorship.jsx
+  - Jobs.jsx
+  - Posts.jsx
+
+- components/
+  - Reuse existing components (Card, Table, Sidebar, Navbar)
+
+-------------------------------------
+
+Routing
+
+/alumni/dashboard  
+/alumni/profile  
+/alumni/achievements  
+/alumni/mentorship  
+/alumni/jobs  
+/alumni/posts  
+
+-------------------------------------
+
+API Integration (Existing + Placeholder)
+
+Use existing backend where available.
+
+Mentorship:
+- GET /api/mentorship/requests (if exists)
+- POST /api/mentorship/respond
+
+Jobs:
+- POST /api/jobs
+- GET /api/jobs/my
+
+Posts:
+- Create placeholder (backend optional for now)
+
+-------------------------------------
+
+Authentication
+
+- Use existing JWT system
+- Role-based rendering:
+  - Only "alumni" can access these routes
+
+-------------------------------------
+
+Testing Checklist
+
+- Alumni can login and access dashboard
+- Profile displays correctly
+- Mentorship requests visible
+- Accept/reject actions work (or simulated)
+- Job posting works
+- UI loads without errors
+
+-------------------------------------
+
+Deliverables
+
+- Fully functional Alumni Portal UI
+- Integrated with backend where possible
+- Clean and professional design
+- Ready for demonstration and screenshots
+
+-------------------------------------
+
+STOP HERE. WAIT FOR PHASE 12 (ADMIN PORTAL)

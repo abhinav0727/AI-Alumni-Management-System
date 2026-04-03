@@ -25,10 +25,10 @@ const columns = [
   },
   { key: 'maxMarks', label: 'Max Marks' },
   {
-    key: 'marksObtained',
+    key: 'scorePercentage',
     label: 'Score %',
-    render: (val, row) => {
-      const pct = row.maxMarks ? ((val / row.maxMarks) * 100).toFixed(1) : 0;
+    render: (_, row) => {
+      const pct = row.maxMarks ? ((row.marksObtained / row.maxMarks) * 100).toFixed(1) : 0;
       const colour = pct >= 75 ? 'text-emerald-700' : pct >= 50 ? 'text-amber-700' : 'text-red-600';
       return <span className={`text-xs font-semibold ${colour}`}>{pct}%</span>;
     },

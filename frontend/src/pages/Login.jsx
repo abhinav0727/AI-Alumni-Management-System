@@ -16,7 +16,12 @@ export default function Login() {
       const { data } = await authApi.login(form);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/dashboard');
+      
+      if (data.user.role === 'alumni') {
+        navigate('/alumni/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Check your credentials.');
     } finally {

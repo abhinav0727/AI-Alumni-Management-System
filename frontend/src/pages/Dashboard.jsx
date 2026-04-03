@@ -13,6 +13,13 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchAll() {
       try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Safeguard to prevent non-students from unintentionally executing student endpoints
+        if (user.role !== 'student') {
+          return;
+        }
+
         const [profRes, coursesRes, attRes, marksRes] = await Promise.allSettled([
           profileApi.getStudentProfile(),
           studentApi.getCourses(),
