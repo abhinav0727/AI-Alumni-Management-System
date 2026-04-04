@@ -22,6 +22,9 @@ exports.uploadResume = async (req, res) => {
     // Extract skills using the centralized NLP service
     const extractedSkills = nlpService.extractSkills(text);
     
+    // Normalize string persistence formats to avoid cross-platform filesystem URL breaks
+    const cleanResumePath = `uploads/${req.file.filename}`;
+    
     let updatedProfile = null;
     let roleMessage = '';
 
@@ -30,7 +33,7 @@ exports.uploadResume = async (req, res) => {
       updatedProfile = await StudentProfile.findOneAndUpdate(
         { user: req.user.id },
         { 
-          resume: req.file.path, 
+          resume: cleanResumePath, 
           skills: extractedSkills 
         },
         { new: true, upsert: true }
@@ -40,7 +43,7 @@ exports.uploadResume = async (req, res) => {
       updatedProfile = await AlumniProfile.findOneAndUpdate(
         { user: req.user.id },
         { 
-          resume: req.file.path,
+          resume: cleanResumePath,
           skills: extractedSkills,
           isMentorAvailable: true 
         },
@@ -54,7 +57,7 @@ exports.uploadResume = async (req, res) => {
     // Optional backwards compatibility: still update base User model
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { resumeURL: req.file.path, extractedSkills },
+      { resumeURL: cleanResumePath, extractedSkills },
       { new: true }
     ).select('-password');
 
@@ -64,7 +67,7 @@ exports.uploadResume = async (req, res) => {
       profile: updatedProfile
     });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ message: 'File upload failed', error: err.message });
   }
 };
 
@@ -74,6 +77,26 @@ exports.getExtractedSkills = async (req, res) => {
     const user = await User.findById(req.user.id).select('extractedSkills');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json({ extractedSkills: user.extractedSkills || [] });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// GET /api/resume/me
+exports.getMyResume = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('resumeURL extractedSkills');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Normalize path format for frontend rendering if necessary
+    const resumeUrl = user.resumeURL ? user.resumeURL.replace(/\\/g, '/') : null;
+    
+    res.status(200).json({
+      resumeUrl: resumeUrl || null,
+      skills: user.extractedSkills || []
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

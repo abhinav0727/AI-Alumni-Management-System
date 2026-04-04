@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
-import { profileApi } from '../services/api';
+import { profileApi, resumeApi } from '../services/api';
 
 const FIELD = ({ label, value }) => (
   <div>
@@ -17,15 +17,55 @@ export default function AlumniProfile() {
   const [editMode, setEditMode] = useState(false);
   const [form,     setForm]     = useState({});
 
+  const [resumeData, setResumeData] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState({ type: '', text: '' });
+
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const initials = (user.name || 'A').split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
 
   useEffect(() => {
-    profileApi.getAlumniProfile()
-      .then((res) => { setProfile(res.data); setForm(res.data); })
-      .catch(() => setError('Could not load profile. Ensure you are logged in as an alumni.'))
-      .finally(() => setLoading(false));
+    Promise.allSettled([
+      profileApi.getAlumniProfile(),
+      resumeApi.getMe()
+    ]).then(([profRes, resRes]) => {
+      if (profRes.status === 'fulfilled') {
+        setProfile(profRes.value.data);
+        setForm(profRes.value.data);
+      } else {
+        setError('Could not load profile. Ensure you are logged in as an alumni.');
+      }
+      
+      if (resRes.status === 'fulfilled') setResumeData(resRes.value.data);
+    }).finally(() => setLoading(false));
   }, []);
+
+  async function handleUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.type !== 'application/pdf') {
+      setUploadMsg({ type: 'error', text: 'Only PDF files are allowed.' });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    setUploading(true);
+    setUploadMsg({ type: '', text: '' });
+
+    try {
+      await resumeApi.upload(formData);
+      setUploadMsg({ type: 'success', text: 'Resume uploaded successfully ✅' });
+      const updatedResume = await resumeApi.getMe();
+      setResumeData(updatedResume.data);
+    } catch (err) {
+      setUploadMsg({ type: 'error', text: err.response?.data?.message || 'Failed to upload resume.' });
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSave(e) {
     e.preventDefault();
@@ -109,12 +149,46 @@ export default function AlumniProfile() {
                   </dl>
                 </div>
 
-                {profile?.skills?.length > 0 && (
+                {/* Resume Upload Module */}
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <h3 className="text-sm font-semibold text-slate-700">Resume & Skills</h3>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full w-max ${resumeData?.resumeUrl ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                      {resumeData?.resumeUrl ? 'Resume uploaded ✅' : 'No resume uploaded'}
+                    </span>
+                  </div>
+                  
+                  <div className="text-sm text-slate-600 mb-4">
+                    Upload your resume in PDF format. We will automatically extract your skills to build your professional graph.
+                  </div>
+
+                  {uploadMsg.text && (
+                    <div className={`mb-4 px-3 py-2 rounded-lg text-sm border ${uploadMsg.type === 'error' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                      {uploadMsg.text}
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-4">
+                    <label className={`cursor-pointer inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${uploading ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm'}`}>
+                      {uploading ? 'Uploading...' : 'Upload PDF'}
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        className="hidden"
+                        onChange={handleUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Extracted Skills */}
+                {(resumeData?.skills?.length > 0 || profile?.skills?.length > 0) && (
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                    <h3 className="text-sm font-semibold text-slate-700 mb-3">Skills</h3>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3">Extracted Skills</h3>
                     <div className="flex flex-wrap gap-2">
-                      {profile.skills.map((s, i) => (
-                        <span key={i} className="px-3 py-1 bg-violet-50 text-violet-700 text-xs font-medium rounded-full">{s}</span>
+                      {(resumeData?.skills?.length ? resumeData.skills : profile?.skills)?.map((s, i) => (
+                        <span key={i} className="px-3 py-1 bg-violet-50 text-violet-700 text-xs font-medium rounded-full border border-violet-100">{s}</span>
                       ))}
                     </div>
                   </div>

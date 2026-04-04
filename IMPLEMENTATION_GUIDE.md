@@ -1045,4 +1045,110 @@ Deliverables
 
 -------------------------------------
 
-STOP HERE. WAIT FOR PHASE 12 (ADMIN PORTAL)
+# PHASE 12 — Resume Upload UI & Skill Extraction Integration
+
+Objective:
+Integrate frontend UI for resume upload and display extracted skills for both students and alumni. This phase connects the already implemented backend resume parsing and skill extraction system to the user interface.
+
+---
+
+## Features to Implement
+
+### 1. Resume Upload (Student & Alumni)
+
+- Allow users to upload resume files (PDF/DOCX)
+- Connect frontend to backend upload API
+- Store resume and trigger skill extraction
+
+---
+
+### 2. Extracted Skills Display
+
+- Fetch extracted skills from backend
+- Display skills in a structured format (tags/cards)
+- Ensure real-time update after upload
+
+---
+
+### 3. Resume Status Indicator
+
+- Show whether resume is uploaded or not
+- Display filename or upload confirmation
+
+---
+
+## API Integration
+
+### Upload Resume
+
+POST /api/resume/upload
+
+- Multipart/form-data request
+- File input: resume
+
+---
+
+### Get Resume & Skills
+
+GET /api/resume/me
+
+Response:
+
+{
+  "resumeUrl": "...",
+  "skills": ["Java", "React", "Node.js"]
+}
+
+---
+
+## Frontend Implementation
+
+### Pages to Modify
+
+- frontend/src/pages/Profile.jsx (Student)
+- frontend/src/pages/AlumniProfile.jsx (Alumni)
+
+---
+
+### Components
+
+- File upload input
+- Upload button
+- Skills display section
+
+---
+
+## UI Requirements
+
+- Clean upload section with button
+- Skills displayed as badges/tags
+- Show loading state during upload
+- Show success message after upload
+
+---
+
+## Validation
+
+- Only allow PDF/DOCX files
+- Prevent empty uploads
+- Handle API errors gracefully
+
+---
+
+## Expected Output
+
+- Users can upload resume successfully
+- Extracted skills are displayed correctly
+- UI reflects backend data accurately
+
+---
+
+## Importance
+
+This phase enables skill visibility, which is essential for:
+
+- AI Mentor Recommendation (Phase 13)
+- Job matching
+- Personalized suggestions
+
+STOP HERE. WAIT FOR PHASE 13.

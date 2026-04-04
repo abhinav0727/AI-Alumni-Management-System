@@ -6,10 +6,16 @@ const { protect } = require('../middleware/authMiddleware');
 const { roleMiddleware } = require('../middleware/roleMiddleware');
 const resumeController = require('../controllers/resumeController');
 
+const fs = require('fs');
+
 // Multer config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads'));
+    const uploadPath = path.join(__dirname, '../uploads');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -32,5 +38,8 @@ router.post('/upload', protect, roleMiddleware('student', 'alumni'), upload.sing
 
 // GET /api/resume/skills
 router.get('/skills', protect, roleMiddleware('student', 'alumni'), resumeController.getExtractedSkills);
+
+// GET /api/resume/me
+router.get('/me', protect, resumeController.getMyResume);
 
 module.exports = router;

@@ -74,4 +74,12 @@ export const studentMentorshipApi = {
   createRequest: (data) => api.post('/student/mentorship', data),
 };
 
+// Resume APIs
+export const resumeApi = {
+  getMe: () => api.get('/resume/me'),
+  upload: (formData) => api.post('/resume/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+};
+
 export default api;
