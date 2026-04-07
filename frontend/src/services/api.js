@@ -69,7 +69,7 @@ export const mentorshipApi = {
 
 // Student - Mentorship APIs
 export const studentMentorshipApi = {
-  getMentors: () => api.get('/student/mentors'),
+  getRecommendedMentors: () => api.get('/recommend/mentors'),
   getMyRequests: () => api.get('/student/mentorship'),
   createRequest: (data) => api.post('/student/mentorship', data),
 };

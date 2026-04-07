@@ -26,7 +26,7 @@ export default function StudentMentorship() {
     try {
       setLoading(true);
       const [mentorsRes, statusRes] = await Promise.all([
-        studentMentorshipApi.getMentors(),
+        studentMentorshipApi.getRecommendedMentors(),
         studentMentorshipApi.getMyRequests()
       ]);
       
@@ -103,9 +103,11 @@ export default function StudentMentorship() {
         {loading ? (
           <p className="text-slate-500">Loading recommended mentors...</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mentors.map((mentor) => {
-              const mentorStatus = requestsMap[mentor._id];
+          <>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">🔥 Recommended Mentors for You</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mentors.map((mentor) => {
+                const mentorStatus = requestsMap[mentor._id];
               const isRequested = !!mentorStatus;
               
               const statusLabels = {
@@ -119,9 +121,16 @@ export default function StudentMentorship() {
               return (
                 <div key={mentor._id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-800">{mentor.name}</h3>
-                    <p className="text-sm text-slate-500 mt-1">{mentor.email}</p>
-                    <div className="mt-2 space-y-0.5">
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="text-lg font-bold text-slate-800">{mentor.name}</h3>
+                      {mentor.similarityScore !== undefined && (
+                        <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                          {mentor.similarityScore}% Match
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-500">{mentor.email}</p>
+                    <div className="mt-3 space-y-1">
                       {mentor.designation && mentor.designation !== 'N/A' && (
                         <p className="text-xs text-slate-600">{mentor.designation}</p>
                       )}
@@ -129,6 +138,19 @@ export default function StudentMentorship() {
                         <p className="text-xs font-semibold text-slate-700">{mentor.company}</p>
                       )}
                     </div>
+
+                    {mentor.skills && mentor.skills.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {mentor.skills.slice(0, 4).map((skill, idx) => (
+                          <span key={idx} className="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-1 rounded-full border border-slate-200">
+                            {skill}
+                          </span>
+                        ))}
+                        {mentor.skills.length > 4 && (
+                          <span className="text-[10px] text-slate-400 font-semibold align-middle mt-1 ml-1">+{mentor.skills.length - 4} more</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   <button
@@ -144,8 +166,9 @@ export default function StudentMentorship() {
                   </button>
                 </div>
               );
-            })}
-          </div>
+              })}
+            </div>
+          </>
         )}
       </div>
 

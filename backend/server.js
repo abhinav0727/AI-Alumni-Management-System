@@ -11,6 +11,7 @@ const resumeRoutes = require('./routes/resumeRoutes');
 const lifecycleRoutes = require('./routes/lifecycleRoutes');
 const mentorRoutes = require('./routes/mentorRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const recommendRoutes = require('./routes/recommendRoutes');
 // Phase 9 – Academic System (FIX #1: renamed studentAcademicRoutes → studentRoutes)
 const studentRoutes = require('./routes/studentRoutes');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
@@ -34,6 +35,7 @@ app.use('/api/resume', resumeRoutes);
 app.use('/api/lifecycle', lifecycleRoutes);
 app.use('/api/mentors', mentorRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/recommend', recommendRoutes);
 // Phase 9 – Academic System (FIX #2: single, verified mount point)
 app.use('/api/student', studentRoutes);
 
